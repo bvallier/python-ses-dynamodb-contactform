@@ -34,6 +34,7 @@ provider:
     EMAIL_SUBJECT: ${self:custom.secrets.EMAIL_SUBJECT}
     CONFIG_SET: ConfigSet
     CONVERTKIT_KEY: ${self:custom.secrets.CONVERTKIT_KEY}
+    CONVERTKIT_FORM: ${self:custom.secrets.CONVERTKIT_FORM}
   iamRoleStatements:
     - Effect: "Allow"
       Action:

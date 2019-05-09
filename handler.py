@@ -12,7 +12,7 @@ sender = os.environ['SENDER_EMAIL']
 subject = os.environ['EMAIL_SUBJECT']
 configset = os.environ['CONFIG_SET']
 convertkit_key = os.environ['CONVERTKIT_KEY']
-convertkit_form_id = os.environ['CONVERTKIT_FORM_ID']
+convertkit_form = os.environ['CONVERTKIT_FORM']
 charset = 'UTF-8'
 
 dynamodb = boto3.resource('dynamodb')
@@ -72,7 +72,7 @@ def addSubscriberPerson(data):
         "email": data['email'],
         "api_key": convertkit_key
     }
-    return requests.post('https://api.convertkit.com/v3/forms/' + str(convertkit_form_id) + '/subscribe',  json=body)
+    return requests.post('https://api.convertkit.com/v3/forms/' + str(convertkit_form) + '/subscribe',  json=body)
 
 def sendMailToUser(data, content):
     # Send Email using SES
