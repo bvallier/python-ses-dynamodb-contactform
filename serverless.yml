@@ -31,7 +31,7 @@ provider:
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
     SENDER_EMAIL: ${self:custom.secrets.SENDER_EMAIL}
-    EMAIL_SUBJECT: SMALL WEB CO CONTACT FORM
+    EMAIL_SUBJECT: ${self:custom.secrets.EMAIL_SUBJECT}
     CONFIG_SET: ConfigSet
     CONVERTKIT_KEY: ${self:custom.secrets.CONVERTKIT_KEY}
   iamRoleStatements:
