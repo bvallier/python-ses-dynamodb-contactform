@@ -5,29 +5,35 @@ import os
 import time
 import uuid
 import decimal
+import requests
 
 client = boto3.client('ses')
 sender = os.environ['SENDER_EMAIL']
 subject = os.environ['EMAIL_SUBJECT']
 configset = os.environ['CONFIG_SET']
+convertkit_key = os.environ['CONVERTKIT_KEY']
 charset = 'UTF-8'
 
 dynamodb = boto3.resource('dynamodb')
+
 
 def sendMail(event, context):
     print(event)
 
     try:
         data = event['body']
-        content = 'Message from ' + data['firstname'] + ' ' + data['lastname'] + ',\nMessage Contents: ' + data['message']
+        content = 'From: ' + data['firstname'] + ' ' + data['lastname'] + \
+            '<br/>Email: ' + data['email'] + '<br/>Message: ' + data['message']
         saveToDynamoDB(data)
         response = sendMailToUser(data, content)
+        convertkit = addSubscriberPerson(data)
     except ClientError as e:
         print(e.response['Error']['Message'])
     else:
         print("Email sent! Message Id:"),
         print(response['MessageId'])
     return "Email sent!"
+
 
 def list(event, context):
     table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
@@ -40,6 +46,7 @@ def list(event, context):
         "statusCode": 200,
         "body": result['Items']
     }
+
 
 def saveToDynamoDB(data):
     timestamp = int(time.time() * 1000)
@@ -57,14 +64,22 @@ def saveToDynamoDB(data):
     table.put_item(Item=item)
     return
 
+
+def addSubscriberPerson(data):
+    body = {
+        "first_name": data['firstname'],
+        "email": data['email'],
+        "api_key": convertkit_key
+    }
+    return requests.post('https://api.convertkit.com/v3/forms/833798/subscribe',  json=body)
+
+
 def sendMailToUser(data, content):
     # Send Email using SES
     return client.send_email(
         Source=sender,
         Destination={
-            'ToAddresses': [
-                data['email'],
-            ],
+            'ToAddresses': [sender],
         },
         Message={
             'Subject': {
